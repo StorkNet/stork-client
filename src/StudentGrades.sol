@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
 import "./StorkContract.sol";
 
@@ -7,56 +7,32 @@ import "./StorkContract.sol";
 /// @author Shankar "theblushirtdude" Subramanian
 /// @notice Honestly idk what this is for
 /// @dev Explain to a developer any extra details
-contract DemoContract is StorkContract {
+contract StudentGrades is StorkContract {
     uint256 public passScore = 50;
 
     struct Student {
         string name;
         uint8 grade;
-        uint8[6] scores;
+        uint8[] scores;
         bool canPromote;
         bool isEvaluated;
     }
 
     constructor(address payable _dataControlAddr) payable {
         storkSetup(_dataControlAddr);
+        owner = msg.sender;
     }
 
-    function createStudentPhalanx() external {
-        PhalanxType[] memory newPhalanxType;
-
-        newPhalanxType[0] = PhalanxType({
-            varType: "string",
-            varName: "name",
-            varIndex: ""
-        });
-        newPhalanxType[1] = PhalanxType({
-            varType: "uint8",
-            varName: "grade",
-            varIndex: ""
-        });
-        newPhalanxType[2] = PhalanxType({
-            varType: "uint8[]",
-            varName: "scores",
-            varIndex: ""
-        });
-        newPhalanxType[3] = PhalanxType({
-            varType: "bool",
-            varName: "canPromote",
-            varIndex: ""
-        });
-        newPhalanxType[3] = PhalanxType({
-            varType: "bool",
-            varName: "isEvaluated",
-            varIndex: ""
-        });
-        createPhalanxType("student", newPhalanxType);
+    function createPhalanx(string memory phalanxName, PhalanxType[] calldata phalanxType) external isOwner {
+    // [["string", "name", ""],["uint8", "grade", ""],["uint8[]", "scores", ""]
+    //,["bool", "canPromote", ""],["bool", "isEvaluated", ""]]    
+        createPhalanxType(phalanxName, phalanxType);
     }
-
+    
     function storeStudentData(
         string calldata _name,
         uint8 _grade,
-        uint8[6] calldata _scores,
+        uint8[] calldata _scores,
         bool _canPromote,
         bool isEvaluated
     ) external {
@@ -74,54 +50,37 @@ contract DemoContract is StorkContract {
         );
     }
 
-    function checkStudentPassGrade(uint32[] memory _storkId) external {
+    function checkStudentPassGrade(uint8[] memory _storkId) external {
         requestStorkById("student", _storkId, "checkStudentPassGradeFallback");
     }
 
     function checkStudentPassGradeFallback(
-        uint8[] calldata _storkId,
+        uint8 _storkId,
         bytes calldata _storkData
     ) external {
-        Student[] memory students = abi.decode(_storkData, (Student[]));
         // or Student memory student = decodeStudent(_storkData); costs slightly more gas ?
-        uint8 scoreSum;
 
-        uint256 len = students.length;
-        for (uint8 i = 0; i < len; ++i) {
-            if (students[i].isEvaluated == true) {
-                continue;
-            }
 
-            for (uint8 j = 0; j < 6; j++) {
-                scoreSum += students[i].scores[i];
-            }
+        uint256 scoreSum;
 
-            if (scoreSum >= passScore) {
-                students[i].canPromote = true;
-            }
+        Student memory student = abi.decode(_storkData, (Student));
+        require(student.isEvaluated == false, "student has been evaluated");
 
-            students[i].isEvaluated = true;
-            students[i].grade++;
-
-            updateStorkById("student", _storkId[i], abi.encode(students[i]));
+        for (uint8 j = 0; j < student.scores.length; ++j) {
+            scoreSum += student.scores[j];
         }
+
+        if (scoreSum >= passScore) {
+            student.canPromote = true;
+        }
+
+        student.isEvaluated = true;
+        student.grade++;
+
+        updateStorkById("student", _storkId, abi.encode(student));
     }
 
-    function deleteGraduated() external {
-        StorkParameter[] memory storkParams;
-
-        storkParams[0] = StorkParameter({
-            typeVarId: 1,
-            operation: CONDITION.eq,
-            varValue: abi.encode(10)
-        });
-
-        storkParams[1] = StorkParameter({
-            typeVarId: 3,
-            operation: CONDITION.eq,
-            varValue: abi.encode(true)
-        });
-
+    function deleteGraduated(StorkParameter[] calldata storkParams) external {
         deleteStorkByParam("student", storkParams);
     }
 
