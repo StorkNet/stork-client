@@ -15,12 +15,7 @@ contract DemoContract is StorkContract {
     }
 
     constructor(address payable _dataControlAddr) payable {
-        setDataControlConractAddr(_dataControlAddr);
-        // also need multi sig addr
-        (bool success, ) = dataControlContract.call{value: msg.value}(
-            abi.encodeWithSignature("addStorkContract()")
-        );
-        require(success, "Failed to add stork contract");
+        storkSetup(_dataControlAddr);
     }
 
     function storeStudentData(
@@ -44,7 +39,7 @@ contract DemoContract is StorkContract {
     ) external pure {
         Student memory student = abi.decode(_storkData, (Student));
 
-        // or Student memory student = decodeStudent(_storkData); costs slightly more gas
+        // or Student memory student = decodeStudent(_storkData); costs slightly more gas ?
 
         student.age++;
 
