@@ -11,11 +11,20 @@ import "./StorkQueries.sol";
 /// @notice Used to connect a StorkContract to StorkNet
 /// @dev
 contract StorkContract is StorkQueries {
+
+    modifier isOwner(){
+        require(msg.sender == owner, "is not owner");
+        _;
+    }
+
     /// @notice Address of the DCC
     address payable public dataControlContract;
 
     /// @notice Address of the MSVC
     address public multiSigVerification;
+
+    /// @notice Address of the MSVC
+    address public owner;
 
     /// @notice Sets the address of the DCC and MSVC
     /// @dev If the address is not set, set the addresses for DCC and MSVC
@@ -83,7 +92,7 @@ contract StorkContract is StorkQueries {
     /// @notice Converts Phalanx types to a bytes array for easier use as a parameter/event value
     /// @dev A bytes version is preferable as it's easier to handle
     /// @param _data Phalanx type array that contains information about the data type
-    function encodeTypes(StorkType[] calldata _data)
+    function encodeTypes(PhalanxType[] memory _data)
         public
         pure
         returns (bytes memory)
@@ -98,12 +107,12 @@ contract StorkContract is StorkQueries {
     function decodeTypes(bytes calldata _data)
         public
         pure
-        returns (StorkType[] memory)
+        returns (PhalanxType[] memory)
     {
-        return (abi.decode(_data, (StorkType[])));
+        return (abi.decode(_data, (PhalanxType[])));
     }
 
-    /// @notice Decodes into a Stork 
+    /// @notice Decodes into a Stork
     /// @dev Decodes the Stork from bytes to Stork {_id, _phalanxType, _data}
     /// @param _data bytes version of a Stork
     /// @return _id and _data of the Stork requested for
@@ -114,4 +123,36 @@ contract StorkContract is StorkQueries {
     {
         return (abi.decode(_data, (uint32, bytes)));
     }
+
+    /// @notice Creates a new StorkNet data type based on the parameters given
+    /// @dev Links the StorkNet data type with unique name and id, then emits an event for off-chain processing
+    /// @param _phalanxName The name of the StorkNet data type
+    /// @param _phalanxType The new StorkNet data type
+    function createPhalanxType(
+        string memory _phalanxName,
+        PhalanxType[] memory _phalanxType
+    ) public isOwner {
+        require(phalanxExists[_phalanxName] == false, "Type already exists");
+
+        phalanxInfo[_phalanxName].phalanxTypeId = storkTypeCount;
+
+        emit NewPhalanxType(
+            storkTypeCount,
+            _phalanxName,
+            encodeTypes(_phalanxType)
+        );
+        phalanxExists[_phalanxName] == true;
+        storkTypeCount++;
+    }
+
+    /// @notice Lets StorkNet know that a new data type has been created for this contract
+    /// @dev This is so that we don't need to store the data type in this contract as they take a lot of space hence gas
+    /// @param _storkTypeCount The id of the created StorkDataType
+    /// @param _storkName The data type name keccak256-ed because that's how events work
+    /// @param _storkData The bytes version of the StorkDataType
+    event NewPhalanxType(
+        uint256 indexed _storkTypeCount,
+        string indexed _storkName,
+        bytes indexed _storkData
+    );
 }
