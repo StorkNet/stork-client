@@ -112,7 +112,7 @@ contract StorkQueries is StorkTypes {
     /// @param _phalanxName The StorkDataType
     /// @param _storkId The index to delete
     function deleteStorkById(
-        string calldata _phalanxName,
+        string memory _phalanxName,
         uint32[] memory _storkId
     ) internal {
         emit EventStorkDeleteById(_phalanxName, _storkId);
@@ -123,7 +123,7 @@ contract StorkQueries is StorkTypes {
     /// @param _phalanxName The StorkDataType
     /// @param _storkParam The index to delete
     function deleteStorkByParam(
-        string calldata _phalanxName,
+        string memory _phalanxName,
         StorkParameter[] memory _storkParam
     ) internal {
         emit EventStorkDeleteByParams(_phalanxName, _storkParam);
