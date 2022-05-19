@@ -16,20 +16,21 @@ contract StorkHandler {
     /// @custom: Uniquely identifiable id for each data stored
     /// @custom: Variable of the data type (name, age, isMale, etc)
     /// @custom: Variable of the data type (name, age, isMale, etc)
+    /// @custom: Variable of the data type (name, age, isMale, etc)
     struct Stork {
         uint32 _id;
-        uint32 _type;
+        uint32 _typeId;
         bytes _data;
     }
 
     /// @notice A collection of Storks
     /// @dev Contains info on a particular group of storks
-    /// @custom: The size of the Phalanx (the collection of storks)
     /// @custom: The stork type id for lookups
+    /// @custom: The size of the Phalanx (the collection of storks)
     /// @custom: Name proposed by Srinidhi
     struct Phalanx {
-        uint32 storkLastId;
         uint32 storkTypeId;
+        uint32 storkLastId;
     }
 
     /// @notice Custom StorkNet datatype for storing data
@@ -165,36 +166,116 @@ contract StorkHandler {
         storkTypeCount++;
     }
 
-    // FIX COMMENTS
+    /// @notice Lets StorkNet know that a new data type has been created for this contract
+    /// @dev This is so that we don't need to store the data type in this contract as they take a lot of space hence gas
+    /// @param _from The address of the contract that created the new StorkDataType
+    /// @param _storkTypeCount The id of the created StorkDataType
+    /// @param _storkName The data type name keccak256-ed because that's how events work
+    /// @param _storkData The bytes version of the StorkDataType
+    event NewStorkType(
+        address indexed _from,
+        uint256 indexed _storkTypeCount,
+        string indexed _storkName,
+        bytes _storkData
+    );
+
+    //-------------------------------------------------------------------------------------
 
     /// @notice Stores new data in the StorkNet
     /// @dev Increments the phalanx's storkLastId, makes a stork with the new id and data, then emits a event
     /// @param _phalanxName The StorkDataType
     /// @param _storkData The value of the data being stored
-    function createData(string memory _phalanxName, bytes memory _storkData)
+    function createStork(string memory _phalanxName, bytes memory _storkData)
         internal
     {
-        uint32 id = phalanxInfo[_phalanxName].storkLastId++;
+        uint32 storkId = phalanxInfo[_phalanxName].storkLastId++ + 1;
 
-        emit StorkCreate(_phalanxName, id, Stork({_id: id, _data: _storkData}));
+        emit StorkCreate(
+            _phalanxName,
+            storkId,
+            Stork({
+                _id: storkId,
+                _typeId: phalanxInfo[_phalanxName].storkTypeId,
+                _data: _storkData
+            })
+        );
     }
+
+    /// @notice Lets StorkNet know that this contract has a new Store request
+    /// @param _phalanxName The address of the contract that created the new StorkDataType
+    /// @param _storkId The data type name keccak256-ed because that's how events work
+    /// @param _stork The data being stored
+    event StorkCreate(
+        string indexed _phalanxName,
+        uint32 indexed _storkId,
+        Stork _stork
+    );
+
+    //-------------------------------------------------------------------------------------
 
     /// @notice Stores the StorkDataType in the StorkNet
     /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
     /// @param _phalanxName The StorkDataType
     /// @param _storkId The value of the data being stored
     /// @param _storkData The value of the data being stored
-    function updateData(
+    function updateStorkById(
         string memory _phalanxName,
         uint32 _storkId,
         bytes memory _storkData
     ) internal {
-        emit StorkUpdate(
+        emit StorkUpdateById(
             _phalanxName,
             _storkId,
-            Stork({_id: _storkId, _data: _storkData})
+            Stork({
+                _id: _storkId,
+                _typeId: phalanxInfo[_phalanxName].storkTypeId,
+                _data: _storkData
+            })
         );
     }
+
+    /// @notice Stores the StorkDataType in the StorkNet
+    /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
+    /// @param _phalanxName The StorkDataType
+    /// @param _storkParam The parameters of the data being stored
+    /// @param _storkData The value of the data being stored
+    function updateStorkByParam(
+        string memory _phalanxName,
+        StorkRequestParameters[] memory _storkParam,
+        bytes memory _storkData
+    ) internal {
+        emit StorkUpdatebyParam(
+            _phalanxName,
+            _storkParam,
+            Stork({
+                _id: phalanxInfo[_phalanxName].storkTypeId,
+                _typeId: phalanxInfo[_phalanxName].storkTypeId,
+                _data: _storkData
+            })
+        );
+    }
+
+    /// @notice Lets StorkNet know that this contract has a new Store request
+    /// @param _phalanxName The address of the contract that created the new StorkDataType
+    /// @param _storkId The data type name keccak256-ed because that's how events work
+    /// @param _stork The data being stored
+    event StorkUpdateById(
+        string indexed _phalanxName,
+        uint32 indexed _storkId,
+        Stork _stork
+    );
+
+    /// @notice Lets StorkNet know that this contract has a new Store request
+    /// @param _phalanxName The address of the contract that created the new StorkDataType
+    /// @param _storkParam The parameters being searched for in the update
+    /// @param _stork The data being stored
+    event StorkUpdatebyParam(
+        string indexed _phalanxName,
+        StorkRequestParameters[] indexed _storkParam,
+        Stork _stork
+    );
+
+    //-------------------------------------------------------------------------------------
 
     /// @notice Stores the StorkDataType in the StorkNet
     /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
@@ -250,41 +331,6 @@ contract StorkHandler {
     }
 
     //-------------------------------------------------------------------------------------
-
-    // FIX COMMENTS
-
-    /// @notice Lets StorkNet know that a new data type has been created for this contract
-    /// @dev This is so that we don't need to store the data type in this contract as they take a lot of space hence gas
-    /// @param _from The address of the contract that created the new StorkDataType
-    /// @param _storkTypeCount The id of the created StorkDataType
-    /// @param _storkName The data type name keccak256-ed because that's how events work
-    /// @param _storkData The bytes version of the StorkDataType
-    event NewStorkType(
-        address indexed _from,
-        uint256 indexed _storkTypeCount,
-        string indexed _storkName,
-        bytes _storkData
-    );
-
-    /// @notice Lets StorkNet know that this contract has a new Store request
-    /// @param _phalanxName The address of the contract that created the new StorkDataType
-    /// @param _storkId The data type name keccak256-ed because that's how events work
-    /// @param _stork The data being stored
-    event StorkCreate(
-        string indexed _phalanxName,
-        uint32 indexed _storkId,
-        Stork _stork
-    );
-
-    /// @notice Lets StorkNet know that this contract has a new Store request
-    /// @param _phalanxName The address of the contract that created the new StorkDataType
-    /// @param _storkId The data type name keccak256-ed because that's how events work
-    /// @param _stork The data being stored
-    event StorkUpdate(
-        string indexed _phalanxName,
-        uint32 indexed _storkId,
-        Stork _stork
-    );
 
     /// @notice Lets StorkNet know that this contract has a new Store request
     /// @param _storkName The data type name keccak256-ed because that's how events work
