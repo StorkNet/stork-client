@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
 import "./StorkTypes.sol";
 
@@ -36,8 +36,8 @@ contract StorkQueries is StorkTypes {
     /// @param _storkId The data type name keccak256-ed because that's how events work
     /// @param _stork The data being stored
     event EventStorkCreate(
-        string indexed _phalanxName,
-        uint8 indexed _storkId,
+        string _phalanxName,
+        uint8  _storkId,
         Stork _stork
     );
 
@@ -90,8 +90,8 @@ contract StorkQueries is StorkTypes {
     /// @param _storkId The data type name keccak256-ed because that's how events work
     /// @param _stork The data being stored
     event EventStorkUpdateById(
-        string indexed _phalanxName,
-        uint32 indexed _storkId,
+        string _phalanxName,
+        uint32 _storkId,
         Stork _stork
     );
 
@@ -100,8 +100,8 @@ contract StorkQueries is StorkTypes {
     /// @param _storkParam The parameters being searched for in the update
     /// @param _stork The data being stored
     event EventStorkUpdateByParams(
-        string indexed _phalanxName,
-        StorkParameter[] indexed _storkParam,
+        string _phalanxName,
+        StorkParameter[]  _storkParam,
         Stork _stork
     );
 
@@ -133,16 +133,16 @@ contract StorkQueries is StorkTypes {
     /// @param _storkName The data type name keccak256-ed because that's how events work
     /// @param _storkId The index to delete
     event EventStorkDeleteById(
-        string indexed _storkName,
-        uint32[] indexed _storkId
+        string _storkName,
+        uint32[] _storkId
     );
 
     /// @notice Lets StorkNet know that this contract has a new Store request
     /// @param _storkName The data type name keccak256-ed because that's how events work
     /// @param _storkParam The index to delete
     event EventStorkDeleteByParams(
-        string indexed _storkName,
-        StorkParameter[] indexed _storkParam
+        string _storkName,
+        StorkParameter[] _storkParam
     );
 
     //-------------------------------------------------------------------------------------
@@ -199,9 +199,9 @@ contract StorkQueries is StorkTypes {
     /// @param _arrayOfIds The data type name keccak256-ed because that's how events work
     /// @param _fallbackFunction The data being stored
     event EventStorkRequestId(
-        string indexed _phalanxName,
-        uint32[] indexed _arrayOfIds,
-        bytes indexed _fallbackFunction
+        string _phalanxName,
+        uint32[] _arrayOfIds,
+        bytes _fallbackFunction
     );
 
     /// @notice Lets StorkNet know that this contract has a new Store request
@@ -209,9 +209,9 @@ contract StorkQueries is StorkTypes {
     /// @param _storkRequestParameters The data type name keccak256-ed because that's how events work
     /// @param _fallbackFunction The data being stored
     event EventStorkRequestByParams(
-        string indexed _phalanxName,
-        StorkParameter[] indexed _storkRequestParameters,
-        bytes indexed _fallbackFunction
+        string _phalanxName,
+        StorkParameter[] _storkRequestParameters,
+        bytes _fallbackFunction
     );
 
     /// @notice Lets StorkNet know that this contract has a new Store request
@@ -219,10 +219,8 @@ contract StorkQueries is StorkTypes {
     /// @param _storkIdRange The data type name keccak256-ed because that's how events work
     /// @param _fallbackFunction The data being stored
     event EventStorkRequestByRange(
-        string indexed _phalanxName,
-        uint32[] indexed _storkIdRange,
-        bytes indexed _fallbackFunction
+        string _phalanxName,
+        uint32[] _storkIdRange,
+        bytes _fallbackFunction
     );
-
-    //-------------------------------------------------------------------------------------
 }

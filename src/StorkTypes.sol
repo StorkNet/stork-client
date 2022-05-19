@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
 /// @custom: Data Control Contract is called DCC
 
@@ -59,7 +59,7 @@ contract StorkTypes {
     struct StorkParameter {
         uint8 typeVarId;
         CONDITION operation;
-        bytes varValue;
+        string varValue;
     }
 
     /// @notice Associates a id number with your custom Phalanx type
