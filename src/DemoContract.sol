@@ -18,6 +18,28 @@ contract DemoContract is StorkContract {
         storkSetup(_dataControlAddr);
     }
 
+    function createStudentPhalanx() external {
+        PhalanxType[] memory newPhalanxType;
+
+        newPhalanxType[0] = PhalanxType({
+            varType: "string",
+            varName: "name",
+            varIndex: ""
+        });
+        newPhalanxType[1] = PhalanxType({
+            varType: "uint256",
+            varName: "age",
+            varIndex: ""
+        });
+        newPhalanxType[2] = PhalanxType({
+            varType: "bool",
+            varName: "isMale",
+            varIndex: ""
+        });
+
+        createPhalanxType("student", newPhalanxType);
+    }
+
     function storeStudentData(
         string calldata _name,
         uint256 _age,
