@@ -24,7 +24,7 @@ contract StorkTypes {
     /// @custom: Solidity data type (string, uint256, bool, etc) of the variable
     /// @custom: Variable name of the data type (name, age, isMale, etc)
     /// @custom: The index of the variable for arrays or mappings
-    struct StorkType {
+    struct PhalanxType {
         string varType;
         string varName;
         string varIndex;
@@ -36,8 +36,8 @@ contract StorkTypes {
     /// @custom: The size of the Phalanx (the collection of storks)
     /// @custom: Name proposed by Srinidhi
     struct Phalanx {
-        uint8 storkTypeId;
-        uint8 storkLastId;
+        uint8 phalanxTypeId;
+        uint8 phalanxLastId;
     }
 
     /// @notice The different types of operations for data processing
@@ -56,12 +56,12 @@ contract StorkTypes {
     /// @custom: Id of the Phalanx type interacted with
     /// @custom: Operation being performed on the variable
     /// @custom: The value of the variable being replaced after the operation is performed
-    struct StorkRequestParameters {
+    struct StorkParameter {
         uint8 typeVarId;
         uint8 operation;
         bytes varValue;
     }
-
+    
     /// @notice Associates a id number with your custom Phalanx type
     /// @dev Maps the data type name to a Phalanx type object
     mapping(string => Phalanx) public phalanxInfo;
