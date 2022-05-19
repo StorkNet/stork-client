@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
 import "./StorkQueries.sol";
 
@@ -29,7 +29,7 @@ contract StorkContract is StorkQueries {
     /// @notice Sets the address of the DCC and MSVC
     /// @dev If the address is not set, set the addresses for DCC and MSVC
     /// @param _dataControlAddr address of the DCC
-    function storkSetup(address payable _dataControlAddr) internal {
+    function storkSetup(address payable _dataControlAddr) payable public {
         // check if the address is null
         require(
             dataControlContract == address(0),
@@ -130,8 +130,8 @@ contract StorkContract is StorkQueries {
     /// @param _phalanxType The new StorkNet data type
     function createPhalanxType(
         string memory _phalanxName,
-        PhalanxType[] memory _phalanxType
-    ) public isOwner {
+        PhalanxType[] calldata _phalanxType
+    ) internal {
         require(phalanxExists[_phalanxName] == false, "Type already exists");
 
         phalanxInfo[_phalanxName].phalanxTypeId = storkTypeCount;
@@ -139,20 +139,21 @@ contract StorkContract is StorkQueries {
         emit NewPhalanxType(
             storkTypeCount,
             _phalanxName,
-            encodeTypes(_phalanxType)
+            abi.encode(_phalanxType)
         );
-        phalanxExists[_phalanxName] == true;
+        phalanxExists[_phalanxName] = true;
+
         storkTypeCount++;
     }
 
     /// @notice Lets StorkNet know that a new data type has been created for this contract
     /// @dev This is so that we don't need to store the data type in this contract as they take a lot of space hence gas
     /// @param _storkTypeCount The id of the created StorkDataType
-    /// @param _storkName The data type name keccak256-ed because that's how events work
+    /// @param _phalanxName The data type name keccak256-ed because that's how events work
     /// @param _storkData The bytes version of the StorkDataType
     event NewPhalanxType(
         uint256 indexed _storkTypeCount,
-        string indexed _storkName,
-        bytes indexed _storkData
+        string  _phalanxName,
+        bytes  _storkData
     );
 }
