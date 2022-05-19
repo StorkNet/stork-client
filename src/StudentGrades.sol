@@ -8,10 +8,14 @@ import "./StorkContract.sol";
 /// @notice Honestly idk what this is for
 /// @dev Explain to a developer any extra details
 contract DemoContract is StorkContract {
+    uint256 public passScore = 50;
+
     struct Student {
         string name;
-        uint256 age;
-        bool isMale;
+        uint8 grade;
+        uint8[6] scores;
+        bool canPromote;
+        bool isEvaluated;
     }
 
     constructor(address payable _dataControlAddr) payable {
@@ -27,45 +31,80 @@ contract DemoContract is StorkContract {
             varIndex: ""
         });
         newPhalanxType[1] = PhalanxType({
-            varType: "uint256",
-            varName: "age",
+            varType: "uint8",
+            varName: "grade",
             varIndex: ""
         });
         newPhalanxType[2] = PhalanxType({
-            varType: "bool",
-            varName: "isMale",
+            varType: "uint8[]",
+            varName: "scores",
             varIndex: ""
         });
-
+        newPhalanxType[3] = PhalanxType({
+            varType: "bool",
+            varName: "canPromote",
+            varIndex: ""
+        });
+        newPhalanxType[3] = PhalanxType({
+            varType: "bool",
+            varName: "isEvaluated",
+            varIndex: ""
+        });
         createPhalanxType("student", newPhalanxType);
     }
 
     function storeStudentData(
         string calldata _name,
-        uint256 _age,
-        bool _isMale
+        uint8 _grade,
+        uint8[6] calldata _scores,
+        bool _canPromote,
+        bool isEvaluated
     ) external {
         createStork(
             "student",
-            abi.encode(Student({name: _name, age: _age, isMale: _isMale}))
+            abi.encode(
+                Student({
+                    name: _name,
+                    grade: _grade,
+                    scores: _scores,
+                    canPromote: _canPromote,
+                    isEvaluated: isEvaluated
+                })
+            )
         );
     }
 
-    function increaseAgeByOne(uint32[] memory _storkId) external {
-        requestStorkById("student", _storkId, "increaseAgeByOneFallback");
+    function checkStudentPassGrade(uint32[] memory _storkId) external {
+        requestStorkById("student", _storkId, "checkStudentPassGradeFallback");
     }
 
-    function increaseAgeByOneFallback(
-        uint32 _storkId,
+    function checkStudentPassGradeFallback(
+        uint8[] calldata _storkId,
         bytes calldata _storkData
-    ) external pure {
-        Student memory student = abi.decode(_storkData, (Student));
-
+    ) external {
+        Student[] memory students = abi.decode(_storkData, (Student[]));
         // or Student memory student = decodeStudent(_storkData); costs slightly more gas ?
+        uint8 scoreSum;
 
-        student.age++;
+        uint256 len = students.length;
+        for (uint8 i = 0; i < len; ++i) {
+            if (students[i].isEvaluated == true) {
+                continue;
+            }
 
-        ("student", _storkId, abi.encode(student));
+            for (uint8 j = 0; j < 6; j++) {
+                scoreSum += students[i].scores[i];
+            }
+
+            if (scoreSum >= passScore) {
+                students[i].canPromote = true;
+            }
+
+            students[i].isEvaluated = true;
+            students[i].grade++;
+
+            updateStorkById("student", _storkId[i], abi.encode(students[i]));
+        }
     }
 
     function decodeStudent(bytes calldata _data)
