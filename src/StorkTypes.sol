@@ -53,7 +53,7 @@ contract StorkTypes {
 
     /// @notice The request parameters for a parameter request
     /// @dev varName is the variable, operation is how compare,varValue is the value
-    /// @custom: Id of the phalanx type interacted with
+    /// @custom: Id of the Phalanx type interacted with
     /// @custom: Operation being performed on the variable
     /// @custom: The value of the variable being replaced after the operation is performed
     struct StorkRequestParameters {
@@ -62,15 +62,15 @@ contract StorkTypes {
         bytes varValue;
     }
 
-    /// @notice Associates a id number with your custom Phalanx data type
-    /// @dev Maps the data type name to a Phalanx data type object
+    /// @notice Associates a id number with your custom Phalanx type
+    /// @dev Maps the data type name to a Phalanx type object
     mapping(string => Phalanx) public phalanxInfo;
 
-    /// @notice Counts the number of Phalanx data types
-    /// @dev Used to keep track of the number of Phalanx data types
+    /// @notice Counts the number of Phalanx types
+    /// @dev Used to keep track of the number of Phalanx types
     uint8 public storkTypeCount;
 
-    /// @notice Checks if a Phalanx data type exists
-    /// @dev Used to check if a Phalanx data type exists
+    /// @notice Checks if a Phalanx type exists
+    /// @dev Used to check if a Phalanx type exists
     mapping(string => bool) public phalanxExists;
 }
