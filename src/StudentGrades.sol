@@ -107,6 +107,24 @@ contract DemoContract is StorkContract {
         }
     }
 
+    function deleteGraduated() external {
+        StorkParameter[] memory storkParams;
+
+        storkParams[0] = StorkParameter({
+            typeVarId: 1,
+            operation: CONDITION.eq,
+            varValue: abi.encode(10)
+        });
+
+        storkParams[1] = StorkParameter({
+            typeVarId: 3,
+            operation: CONDITION.eq,
+            varValue: abi.encode(true)
+        });
+
+        deleteStorkByParam("student", storkParams);
+    }
+
     function decodeStudent(bytes calldata _data)
         public
         pure
