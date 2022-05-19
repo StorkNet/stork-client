@@ -4,6 +4,7 @@ pragma solidity ^0.8.10;
 import "./StorkQueries.sol";
 
 /// @custom: Data Control Contract is called DCC
+/// @custom: Multi Sig Verfication Contract is called MSVC
 
 /// @title Stork Handler Contract
 /// @author Shankar "theblushirtdude" Subramanian
@@ -11,17 +12,49 @@ import "./StorkQueries.sol";
 /// @dev
 contract StorkContract is StorkQueries {
     /// @notice Address of the DCC
-    address public dataControlContract;
+    address payable public dataControlContract;
 
-    /// @notice Sets the address of the DCC
-    /// @dev If the address is not set, then set the address of the DCC
-    /// @param _addr address of the DCC
-    function setDataControlConractAddr(address _addr) internal {
+    /// @notice Address of the MSVC
+    address public multiSigVerification;
+
+    /// @notice Sets the address of the DCC and MSVC
+    /// @dev If the address is not set, set the addresses for DCC and MSVC
+    /// @param _dataControlAddr address of the DCC
+    function storkSetup(address payable _dataControlAddr) internal {
+        // check if the address is null
         require(
             dataControlContract == address(0),
-            "DataControlContract addr already set"
+            "StorkContract already initialized"
         );
-        dataControlContract = _addr;
+
+        // gets the minimum stake amount from the DCC
+        (, bytes memory minStakeBytes) = _dataControlAddr.staticcall(
+            abi.encodeWithSignature("getMinStakeValue()")
+        );
+
+        uint256 minStake = abi.decode(minStakeBytes, (uint256));
+
+        // checks if the msg.value is greater than the minimum stake amount
+        require(
+            msg.value > minStake,
+            "Not enough stake value, check minStake at DCC"
+        );
+
+        // perform the transaction
+        (bool success, ) = _dataControlAddr.call{value: msg.value}(
+            abi.encodeWithSignature("addStorkContract()")
+        );
+        require(success, "Failed to add stork contract");
+
+        // if the transaction is successful, set the address of the DCC
+        dataControlContract = _dataControlAddr;
+
+        // get the address of the MSVC
+        (, bytes memory data) = _dataControlAddr.staticcall(
+            abi.encodeWithSignature("getMultiSigAddr()")
+        );
+
+        multiSigVerification = abi.decode(data, (address));
     }
 
     /// @notice Initializes your StorkContract with some ETH so that it can interact with StorkNet
@@ -47,9 +80,9 @@ contract StorkContract is StorkQueries {
         return (abi.decode(data, (uint256)));
     }
 
-    /// @notice Converts a Phalanx data types to a bytes array for easier use as a parameter/event value
+    /// @notice Converts Phalanx types to a bytes array for easier use as a parameter/event value
     /// @dev A bytes version is preferable as it's easier to handle
-    /// @param _data a parameter just like in doxygen (must be followed by parameter name)
+    /// @param _data Phalanx type array that contains information about the data type
     function encodeTypes(StorkType[] calldata _data)
         public
         pure
@@ -58,10 +91,10 @@ contract StorkContract is StorkQueries {
         return (abi.encode(_data));
     }
 
-    /// @notice Converts the bytes array to a StorkDataType
+    /// @notice Converts the bytes array to a Phalanx type
     /// @dev Decoding back to extract the data types, variable names, and indexes if any
-    /// @param _data Bytes version of the StorkDataType
-    /// @return StorkDataType conversion of the bytes array version
+    /// @param _data Bytes version of the Phalanx type
+    /// @return Phalax type in bytes
     function decodeTypes(bytes calldata _data)
         public
         pure
@@ -70,12 +103,10 @@ contract StorkContract is StorkQueries {
         return (abi.decode(_data, (StorkType[])));
     }
 
-    // FIX COMMENTS
-
-    /// @notice Converts the bytes array to a StorkDataType
-    /// @dev Decoding back to extract the data types, variable names, and indexes if any
-    /// @param _data Bytes version of the StorkDataType
-    /// @return StorkDataType conversion of the bytes array version
+    /// @notice Decodes into a Stork 
+    /// @dev Decodes the Stork from bytes to Stork {_id, _phalanxType, _data}
+    /// @param _data bytes version of a Stork
+    /// @return _id and _data of the Stork requested for
     function storkDecode(bytes calldata _data)
         internal
         pure
