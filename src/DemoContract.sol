@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import "./StorkHandler.sol";
+import "./StorkContract.sol";
 
 /// @title Demo Contract
 /// @author Shankar "theblushirtdude" Subramanian
 /// @notice Honestly idk what this is for
 /// @dev Explain to a developer any extra details
-contract DemoContract is StorkHandler {
+contract DemoContract is StorkContract {
     struct Student {
         string name;
         uint256 age;
@@ -28,27 +28,27 @@ contract DemoContract is StorkHandler {
         uint256 _age,
         bool _isMale
     ) external {
-        createData(
+        createStork(
             "student",
             abi.encode(Student({name: _name, age: _age, isMale: _isMale}))
         );
     }
 
     function increaseAgeByOne(uint32[] memory _storkId) external {
-        requestIdData("student", _storkId, "increaseAgeByOneFallback");
+        requestStorkById("student", _storkId, "increaseAgeByOneFallback");
     }
 
     function increaseAgeByOneFallback(
         uint32 _storkId,
         bytes calldata _storkData
-    ) external {
+    ) external pure {
         Student memory student = abi.decode(_storkData, (Student));
 
         // or Student memory student = decodeStudent(_storkData); costs slightly more gas
 
         student.age++;
 
-        updateData("student", _storkId, abi.encode(student));
+        ("student", _storkId, abi.encode(student));
     }
 
     function decodeStudent(bytes calldata _data)
