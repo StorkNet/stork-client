@@ -280,12 +280,38 @@ contract StorkHandler {
     /// @notice Stores the StorkDataType in the StorkNet
     /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
     /// @param _phalanxName The StorkDataType
-    /// @param _storkId The value of the data being stored
-    function deleteData(string calldata _phalanxName, uint32 _storkId)
+    /// @param _storkId The index to delete
+    function deleteDataById(string calldata _phalanxName, uint32 _storkId)
         internal
     {
-        emit StorkDelete(_phalanxName, _storkId);
+        emit StorkDeleteById(_phalanxName, _storkId);
     }
+
+    /// @notice Stores the StorkDataType in the StorkNet
+    /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
+    /// @param _phalanxName The StorkDataType
+    /// @param _storkParam The index to delete
+    function deleteDataByParam(
+        string calldata _phalanxName,
+        StorkRequestParameters[] memory _storkParam
+    ) internal {
+        emit StorkDeleteByParam(_phalanxName, _storkParam);
+    }
+
+    /// @notice Lets StorkNet know that this contract has a new Store request
+    /// @param _storkName The data type name keccak256-ed because that's how events work
+    /// @param _storkId The index to delete
+    event StorkDeleteById(string indexed _storkName, uint32 indexed _storkId);
+
+    /// @notice Lets StorkNet know that this contract has a new Store request
+    /// @param _storkName The data type name keccak256-ed because that's how events work
+    /// @param _storkParam The index to delete
+    event StorkDeleteByParam(
+        string indexed _storkName,
+        StorkRequestParameters[] indexed _storkParam
+    );
+
+    //-------------------------------------------------------------------------------------
 
     /// @notice Stores the StorkDataType in the StorkNet
     /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
@@ -330,13 +356,6 @@ contract StorkHandler {
         );
     }
 
-    //-------------------------------------------------------------------------------------
-
-    /// @notice Lets StorkNet know that this contract has a new Store request
-    /// @param _storkName The data type name keccak256-ed because that's how events work
-    /// @param _storkId The data being stored
-    event StorkDelete(string indexed _storkName, uint32 indexed _storkId);
-
     /// @notice Lets StorkNet know that this contract has a new Store request
     /// @param _phalanxName The address of the contract that created the new StorkDataType
     /// @param _storkIdRange The data type name keccak256-ed because that's how events work
@@ -366,4 +385,6 @@ contract StorkHandler {
         StorkRequestParameters[] indexed _storkRequestParameters,
         bytes indexed _fallbackFunction
     );
+
+    //-------------------------------------------------------------------------------------
 }
