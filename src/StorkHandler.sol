@@ -18,6 +18,7 @@ contract StorkHandler {
     /// @custom: Variable of the data type (name, age, isMale, etc)
     struct Stork {
         uint32 _id;
+        uint32 _type;
         bytes _data;
     }
 
@@ -248,9 +249,7 @@ contract StorkHandler {
         );
     }
 
-    //requestRangeData("student", _startId to EndId, "fallback function");
-    //requestIdData("student", _arrayOfIds, "fallback function");
-    //requestParameterData("student", "{parameter,value}" , "fallback function");
+    //-------------------------------------------------------------------------------------
 
     // FIX COMMENTS
 
