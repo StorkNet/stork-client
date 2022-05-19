@@ -42,7 +42,7 @@ contract StorkTypes {
 
     /// @notice The different types of operations for data processing
     /// @dev The different operations for delete, update, and create
-    enum Operations {
+    enum CONDITION {
         eq, // equals to
         gt, // greater than
         lt, // less than
@@ -58,10 +58,10 @@ contract StorkTypes {
     /// @custom: The value of the variable being replaced after the operation is performed
     struct StorkParameter {
         uint8 typeVarId;
-        uint8 operation;
+        CONDITION operation;
         bytes varValue;
     }
-    
+
     /// @notice Associates a id number with your custom Phalanx type
     /// @dev Maps the data type name to a Phalanx type object
     mapping(string => Phalanx) public phalanxInfo;
