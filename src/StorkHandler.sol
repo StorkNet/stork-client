@@ -13,10 +13,9 @@ contract StorkHandler {
 
     /// @notice Storks are the smallest data unit of the StorkNet
     /// @dev It contains the data stored in the request along with a unique id wrt the collection
-    /// @custom: Uniquely identifiable id for each data stored
-    /// @custom: Variable of the data type (name, age, isMale, etc)
-    /// @custom: Variable of the data type (name, age, isMale, etc)
-    /// @custom: Variable of the data type (name, age, isMale, etc)
+    /// @custom: Unique id for each data stored of Flock _typeId
+    /// @custom: Id of the Phalanx type interacted with
+    /// @custom: Bytes data of the Stork type _typeId (name, age, isMale, etc)
     struct Stork {
         uint32 _id;
         uint32 _typeId;
@@ -25,7 +24,7 @@ contract StorkHandler {
 
     /// @notice A collection of Storks
     /// @dev Contains info on a particular group of storks
-    /// @custom: The stork type id for lookups
+    /// @custom: The Phalanx type id for lookups
     /// @custom: The size of the Phalanx (the collection of storks)
     /// @custom: Name proposed by Srinidhi
     struct Phalanx {
@@ -36,7 +35,7 @@ contract StorkHandler {
     /// @notice Custom StorkNet datatype for storing data
     /// @dev StorkDataType is the custom data type so that StorkNodes can process data off-chain for lookups
     /// @custom: Solidity data type (string, uint256, bool, etc) of the variable
-    /// @custom: Variable of the data type (name, age, isMale, etc)
+    /// @custom: Variable name of the data type (name, age, isMale, etc)
     /// @custom: The index of the variable for arrays or mappings
     struct StorkType {
         string varType;
@@ -44,41 +43,43 @@ contract StorkHandler {
         string varIndex;
     }
 
+    /// @notice The different types of operations for data processing
+    /// @dev The different operations for delete, update, and create
     enum Operations {
-        eq,
-        gt,
-        lt,
-        gte,
-        lte,
-        neq
+        eq, // equals to
+        gt, // greater than
+        lt, // less than
+        gte, // greater than or equal to
+        lte, // less than or equal to
+        neq // not equal to
     }
-
-    // FILL IN LATER
 
     /// @notice The request parameters for a parameter request
     /// @dev varName is the variable, operation is how compare,varValue is the value
-    /// @custom: Variable of the data type (name, age, isMale, etc)
-    /// @custom: The index of the variable for arrays or mappings
-    /// @custom: The index of the variable for arrays or mappings
+    /// @custom: Id of the phalanx type interacted with
+    /// @custom: Operation being performed on the variable
+    /// @custom: The value of the variable being replaced after the operation is performed
     struct StorkRequestParameters {
         uint16 typeVarId;
         uint16 operation;
         bytes varValue;
     }
 
-    /// @notice Associates a id number with your custom storkDataType
-    /// @dev Maps the data type name to a StorkDataType object
+    /// @notice Associates a id number with your custom Phalanx data type
+    /// @dev Maps the data type name to a Phalanx data type object
     mapping(string => Phalanx) public phalanxInfo;
 
-    /// @notice Counts the number of storkDataTypes
-    /// @dev Used to keep track of the number of storkDataTypes
+    /// @notice Counts the number of Phalanx data types
+    /// @dev Used to keep track of the number of Phalanx data types
     uint32 public storkTypeCount;
 
-    mapping(string => bool) phalanxExists;
+    /// @notice Checks if a Phalanx data type exists
+    /// @dev Used to check if a Phalanx data type exists
+    mapping(string => bool) public phalanxExists;
 
     /// @notice Sets the address of the DCC
     /// @dev If the address is not set, then set the address of the DCC
-    /// @param _addr The address of the DCC
+    /// @param _addr address of the DCC
     function setDataControlConractAddr(address _addr) internal {
         require(
             dataControlContract == address(0),
@@ -97,7 +98,7 @@ contract StorkHandler {
     }
 
     /// @notice Returns the number of transactions that can be made by this StorkContract
-    /// @dev staticcall to the DCC to get the number of txLeft of the StorkContract
+    /// @dev STATICCALL to the DCC to get the number of txLeft of the StorkContract
     /// @return uint256 for the number of Txns left that can be made
     function txsLeft() public view returns (uint256) {
         (bool success, bytes memory data) = dataControlContract.staticcall(
@@ -110,7 +111,7 @@ contract StorkHandler {
         return (abi.decode(data, (uint256)));
     }
 
-    /// @notice Converts a StorkDataType to a bytes array for easier use as a parameter/event value
+    /// @notice Converts a Phalanx data types to a bytes array for easier use as a parameter/event value
     /// @dev A bytes version is preferable as it's easier to handle
     /// @param _data a parameter just like in doxygen (must be followed by parameter name)
     function encodeTypes(StorkType[] calldata _data)
@@ -244,7 +245,7 @@ contract StorkHandler {
         StorkRequestParameters[] memory _storkParam,
         bytes memory _storkData
     ) internal {
-        emit StorkUpdatebyParam(
+        emit StorkUpdateByParams(
             _phalanxName,
             _storkParam,
             Stork({
@@ -269,7 +270,7 @@ contract StorkHandler {
     /// @param _phalanxName The address of the contract that created the new StorkDataType
     /// @param _storkParam The parameters being searched for in the update
     /// @param _stork The data being stored
-    event StorkUpdatebyParam(
+    event StorkUpdateByParams(
         string indexed _phalanxName,
         StorkRequestParameters[] indexed _storkParam,
         Stork _stork
@@ -281,7 +282,7 @@ contract StorkHandler {
     /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
     /// @param _phalanxName The StorkDataType
     /// @param _storkId The index to delete
-    function deleteDataById(string calldata _phalanxName, uint32 _storkId)
+    function deleteStorkById(string calldata _phalanxName, uint32 _storkId)
         internal
     {
         emit StorkDeleteById(_phalanxName, _storkId);
@@ -291,11 +292,11 @@ contract StorkHandler {
     /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
     /// @param _phalanxName The StorkDataType
     /// @param _storkParam The index to delete
-    function deleteDataByParam(
+    function deleteStorkByParam(
         string calldata _phalanxName,
         StorkRequestParameters[] memory _storkParam
     ) internal {
-        emit StorkDeleteByParam(_phalanxName, _storkParam);
+        emit StorkDeleteByParams(_phalanxName, _storkParam);
     }
 
     /// @notice Lets StorkNet know that this contract has a new Store request
@@ -306,7 +307,7 @@ contract StorkHandler {
     /// @notice Lets StorkNet know that this contract has a new Store request
     /// @param _storkName The data type name keccak256-ed because that's how events work
     /// @param _storkParam The index to delete
-    event StorkDeleteByParam(
+    event StorkDeleteByParams(
         string indexed _storkName,
         StorkRequestParameters[] indexed _storkParam
     );
@@ -314,24 +315,12 @@ contract StorkHandler {
     //-------------------------------------------------------------------------------------
 
     /// @notice Stores the StorkDataType in the StorkNet
-    /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
-    /// @param _phalanxName The StorkDataType
-    /// @param _storkIdRange The value of the data being stored
-    /// @param _fallbackFunction The value of the data being stored
-    function requestRangeData(
-        string memory _phalanxName,
-        uint32[] memory _storkIdRange,
-        bytes memory _fallbackFunction
-    ) internal {
-        emit StorkRequestRange(_phalanxName, _storkIdRange, _fallbackFunction);
-    }
-
     /// @notice Stores the StorkDataType in the StorkNet
     /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
     /// @param _phalanxName The StorkDataType
     /// @param _arrayOfIds The value of the data being stored
     /// @param _fallbackFunction The value of the data being stored
-    function requestIdData(
+    function requestStorkById(
         string memory _phalanxName,
         uint32[] memory _arrayOfIds,
         bytes memory _fallbackFunction
@@ -344,27 +333,33 @@ contract StorkHandler {
     /// @param _phalanxName The StorkDataType
     /// @param _storkRequestParameters The value of the data being stored
     /// @param _fallbackFunction The value of the data being stored
-    function requestParameterData(
+    function requestStorkByParams(
         string memory _phalanxName,
         StorkRequestParameters[] memory _storkRequestParameters,
         bytes memory _fallbackFunction
     ) internal {
-        emit StorkRequestRange(
+        emit StorkRequestByParams(
             _phalanxName,
             _storkRequestParameters,
             _fallbackFunction
         );
     }
 
-    /// @notice Lets StorkNet know that this contract has a new Store request
-    /// @param _phalanxName The address of the contract that created the new StorkDataType
-    /// @param _storkIdRange The data type name keccak256-ed because that's how events work
-    /// @param _fallbackFunction The data being stored
-    event StorkRequestRange(
-        string indexed _phalanxName,
-        uint32[] indexed _storkIdRange,
-        bytes indexed _fallbackFunction
-    );
+    /// @dev The event emitted tells StorkNet about the data being stored, it's type, and the contract associated
+    /// @param _phalanxName The StorkDataType
+    /// @param _storkIdRange The value of the data being stored
+    /// @param _fallbackFunction The value of the data being stored
+    function requestStorkByRange(
+        string memory _phalanxName,
+        uint32[] memory _storkIdRange,
+        bytes memory _fallbackFunction
+    ) internal {
+        emit StorkRequestByRange(
+            _phalanxName,
+            _storkIdRange,
+            _fallbackFunction
+        );
+    }
 
     /// @notice Lets StorkNet know that this contract has a new Store request
     /// @param _phalanxName The address of the contract that created the new StorkDataType
@@ -380,9 +375,19 @@ contract StorkHandler {
     /// @param _phalanxName The address of the contract that created the new StorkDataType
     /// @param _storkRequestParameters The data type name keccak256-ed because that's how events work
     /// @param _fallbackFunction The data being stored
-    event StorkRequestRange(
+    event StorkRequestByParams(
         string indexed _phalanxName,
         StorkRequestParameters[] indexed _storkRequestParameters,
+        bytes indexed _fallbackFunction
+    );
+
+    /// @notice Lets StorkNet know that this contract has a new Store request
+    /// @param _phalanxName The address of the contract that created the new StorkDataType
+    /// @param _storkIdRange The data type name keccak256-ed because that's how events work
+    /// @param _fallbackFunction The data being stored
+    event StorkRequestByRange(
+        string indexed _phalanxName,
+        uint32[] indexed _storkIdRange,
         bytes indexed _fallbackFunction
     );
 
