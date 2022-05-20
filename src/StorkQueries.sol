@@ -50,7 +50,7 @@ contract StorkQueries is StorkTypes {
     /// @param _abiEncodeData The value of the data being stored
     function updateStorkById(
         string memory _phalanxName,
-        uint32 _storkId,
+        uint8 _storkId,
         bytes memory _abiEncodeData
     ) internal {
         emit EventStorkUpdateById(
@@ -91,7 +91,7 @@ contract StorkQueries is StorkTypes {
     /// @param _stork The data being stored
     event EventStorkUpdateById(
         string _phalanxName,
-        uint32 _storkId,
+        uint8 _storkId,
         Stork _stork
     );
 
@@ -113,7 +113,7 @@ contract StorkQueries is StorkTypes {
     /// @param _storkId The index to delete
     function deleteStorkById(
         string memory _phalanxName,
-        uint32[] memory _storkId
+        uint8[] memory _storkId
     ) internal {
         emit EventStorkDeleteById(_phalanxName, _storkId);
     }
@@ -134,7 +134,7 @@ contract StorkQueries is StorkTypes {
     /// @param _storkId The index to delete
     event EventStorkDeleteById(
         string _storkName,
-        uint32[] _storkId
+        uint8[] _storkId
     );
 
     /// @notice Lets StorkNet know that this contract has a new Store request
@@ -155,7 +155,7 @@ contract StorkQueries is StorkTypes {
     /// @param _fallbackFunction The value of the data being stored
     function requestStorkById(
         string memory _phalanxName,
-        uint32[] memory _arrayOfIds,
+        uint8[] memory _arrayOfIds,
         bytes memory _fallbackFunction
     ) internal {
         emit EventStorkRequestId(_phalanxName, _arrayOfIds, _fallbackFunction);
@@ -184,7 +184,7 @@ contract StorkQueries is StorkTypes {
     /// @param _fallbackFunction The value of the data being stored
     function requestStorkByRange(
         string memory _phalanxName,
-        uint32[] memory _storkIdRange,
+        uint8[] memory _storkIdRange,
         bytes memory _fallbackFunction
     ) internal {
         emit EventStorkRequestByRange(
@@ -200,7 +200,7 @@ contract StorkQueries is StorkTypes {
     /// @param _fallbackFunction The data being stored
     event EventStorkRequestId(
         string _phalanxName,
-        uint32[] _arrayOfIds,
+        uint8[] _arrayOfIds,
         bytes _fallbackFunction
     );
 
@@ -220,7 +220,7 @@ contract StorkQueries is StorkTypes {
     /// @param _fallbackFunction The data being stored
     event EventStorkRequestByRange(
         string _phalanxName,
-        uint32[] _storkIdRange,
+        uint8[] _storkIdRange,
         bytes _fallbackFunction
     );
 }
