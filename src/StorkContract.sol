@@ -18,27 +18,24 @@ contract StorkContract is StorkQueries {
     }
 
     /// @notice Address of the DCC
-    address payable public dataControlContract;
-
-    /// @notice Address of the MSVC
-    address public multiSigVerification;
+    address payable public storkFund;
 
     /// @notice Address of the MSVC
     address public owner;
 
     /// @notice Sets the address of the DCC and MSVC
     /// @dev If the address is not set, set the addresses for DCC and MSVC
-    /// @param _dataControlAddr address of the DCC
-    function storkSetup(address payable _dataControlAddr) payable public {
+    /// @param _storkFund address of the DCC
+    function storkSetup(address payable _storkFund) payable public {
         // check if the address is null
         require(
-            dataControlContract == address(0),
+            storkFund == address(0),
             "StorkContract already initialized"
         );
 
         // gets the minimum stake amount from the DCC
-        (, bytes memory minStakeBytes) = _dataControlAddr.staticcall(
-            abi.encodeWithSignature("getMinStakeValue()")
+        (, bytes memory minStakeBytes) = _storkFund.staticcall(
+            abi.encodeWithSignature("getMinFundValue()")
         );
 
         uint256 minStake = abi.decode(minStakeBytes, (uint256));
@@ -50,26 +47,20 @@ contract StorkContract is StorkQueries {
         );
 
         // perform the transaction
-        (bool success, ) = _dataControlAddr.call{value: msg.value}(
+        (bool success, ) = _storkFund.call{value: msg.value}(
             abi.encodeWithSignature("addStorkContract()")
         );
         require(success, "Failed to add stork contract");
 
         // if the transaction is successful, set the address of the DCC
-        dataControlContract = _dataControlAddr;
+        storkFund = _storkFund;
 
-        // get the address of the MSVC
-        (, bytes memory data) = _dataControlAddr.staticcall(
-            abi.encodeWithSignature("getMultiSigAddr()")
-        );
-
-        multiSigVerification = abi.decode(data, (address));
     }
 
     /// @notice Initializes your StorkContract with some ETH so that it can interact with StorkNet
     /// @dev A call function to the DCC with some ETH to initialize the StorkContract
     function contractFunding() external payable {
-        (bool success, ) = dataControlContract.call{value: msg.value}(
+        (bool success, ) = storkFund.call{value: msg.value}(
             abi.encodeWithSignature("fundStorkContract(address)", this)
         );
         require(success, "Failed to fund contract");
@@ -79,7 +70,7 @@ contract StorkContract is StorkQueries {
     /// @dev STATICCALL to the DCC to get the number of txLeft of the StorkContract
     /// @return uint256 for the number of Txns left that can be made
     function txsLeft() public view returns (uint256) {
-        (bool success, bytes memory data) = dataControlContract.staticcall(
+        (bool success, bytes memory data) = storkFund.staticcall(
             abi.encodeWithSignature("txLeftStorkContract(address)", this)
         );
 

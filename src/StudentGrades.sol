@@ -18,14 +18,14 @@ contract StudentGrades is StorkContract {
         bool isEvaluated;
     }
 
-    constructor(address payable _dataControlAddr) payable {
-        storkSetup(_dataControlAddr);
+    constructor(address payable _storkFundAddr) payable {
+        storkSetup(_storkFundAddr);
         owner = msg.sender;
     }
 
     function createPhalanx(string memory phalanxName, PhalanxType[] calldata phalanxType) external isOwner {
-    // [["string", "name", ""],["uint8", "grade", ""],["uint8[]", "scores", ""]
-    //,["bool", "canPromote", ""],["bool", "isEvaluated", ""]]    
+    // [["string", "name", ""],["uint8", "grade", ""],["uint8[]", "scores", ""],
+    // ["bool", "canPromote", ""],["bool", "isEvaluated", ""]]    
         createPhalanxType(phalanxName, phalanxType);
     }
     
@@ -50,7 +50,7 @@ contract StudentGrades is StorkContract {
         );
     }
 
-    function checkStudentPassGrade(uint8[] memory _storkId) external {
+    function checkStudentPassGrade(uint32[] memory _storkId) external {
         requestStorkById("student", _storkId, "checkStudentPassGradeFallback");
     }
 
