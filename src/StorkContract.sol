@@ -66,20 +66,9 @@ contract StorkContract is StorkQueries {
 
         phalanxInfo[_phalanxName].phalanxTypeId = storkTypeCount;
 
-        // emit NewPhalanxType(
-        //     storkTypeCount,
-        //     _phalanxName,
-        //     abi.encode(_phalanxType)
-        // );
         phalanxExists[_phalanxName] == true;
         storkTypeCount++;
     }
-
-    // event NewPhalanxType(
-    //     uint256 indexed _storkTypeCount,
-    //     string indexed _storkName,
-    //     bytes indexed _storkData
-    // );
 
     /// @notice Initializes your StorkContract with some ETH so that it can interact with StorkNet
     /// @dev A call function to the DCC with some ETH to initialize the StorkContract
