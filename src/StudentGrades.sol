@@ -23,12 +23,13 @@ contract StudentGrades is StorkContract {
         owner = msg.sender;
     }
 
-    function createPhalanx(string memory phalanxName, PhalanxType[] calldata phalanxType) external isOwner {
-    // [["string", "name", ""],["uint8", "grade", ""],["uint8[]", "scores", ""],
-    // ["bool", "canPromote", ""],["bool", "isEvaluated", ""]]    
-        createPhalanxType(phalanxName, phalanxType);
+    // function createPhalanx(string memory phalanxName, PhalanxType[] calldata phalanxType) external isOwner {
+    function createPhalanx(string memory phalanxName) external isOwner {
+        // [["string", "name", ""],["uint8", "grade", ""],["uint8[]", "scores", ""],
+        // ["bool", "canPromote", ""],["bool", "isEvaluated", ""]]
+        createPhalanxType(phalanxName); //, phalanxType);
     }
-    
+
     function storeStudentData(
         string calldata _name,
         uint8 _grade,
@@ -59,7 +60,6 @@ contract StudentGrades is StorkContract {
         bytes calldata _storkData
     ) external {
         // or Student memory student = decodeStudent(_storkData); costs slightly more gas ?
-
 
         uint256 scoreSum;
 

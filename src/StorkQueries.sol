@@ -4,12 +4,6 @@ pragma solidity ^0.8.0;
 import "./StorkTypes.sol";
 
 contract StorkQuery is StorkTypes {
-    function createPhalanxType(
-        uint256 _storkTypeCount,
-        string memory _phalanxName,
-        bytes calldata _phalanxType
-    ) external {}
-
     function createStork(
         string memory _phalanxName,
         uint8 _storkId,
@@ -65,23 +59,6 @@ contract StorkQuery is StorkTypes {
 /// @dev
 contract StorkQueries is StorkTypes {
     StorkQuery public storkQuery;
-
-    function createPhalanxType(
-        string memory _phalanxName,
-        PhalanxType[] calldata _phalanxType
-    ) internal {
-        require(phalanxExists[_phalanxName] == false, "Type already exists");
-
-        phalanxInfo[_phalanxName].phalanxTypeId = storkTypeCount;
-        storkQuery.createPhalanxType(
-            storkTypeCount,
-            _phalanxName,
-            abi.encode(_phalanxType)
-        );
-        phalanxExists[_phalanxName] = true;
-
-        storkTypeCount++;
-    }
 
     /// @notice Stores new data in the StorkNet
     /// @dev Increments the phalanx's storkLastId, makes a stork with the new id and data, then emits a event
