@@ -35,19 +35,25 @@ contract StorkQuery is StorkTypes {
     function requestStorkById(
         string memory _phalanxName,
         uint32[] memory _storkId,
-        string memory _fallbackFunction
+        string memory _fallbackFunction,
+        string memory _destinationNetwork,
+        address _destinationContract
     ) external {}
 
     function requestStorkByParam(
         string memory _phalanxName,
         StorkParameter[] memory _storkParam,
-        string memory _fallbackFunction
+        string memory _fallbackFunction,
+        string memory _destinationNetwork,
+        address _destinationContract
     ) external {}
 
     function requestStorkByRange(
         string memory _phalanxName,
         uint32[] memory _storkIdRange,
-        string memory _fallbackFunction
+        string memory _fallbackFunction,
+        string memory _destinationNetwork,
+        address _destinationContract
     ) external {}
 }
 
@@ -133,12 +139,16 @@ contract StorkQueries is StorkTypes {
     function requestStorkById(
         string memory _phalanxName,
         uint32[] memory _arrayOfIds,
-        string memory _fallbackFunction
+        string memory _fallbackFunction,
+        string memory _destinationNetwork,
+        address _destinationContract
     ) internal {
         storkQuery.requestStorkById(
             _phalanxName,
             _arrayOfIds,
-            _fallbackFunction
+            _fallbackFunction,
+            _destinationNetwork,
+            _destinationContract
         );
     }
 
@@ -150,12 +160,16 @@ contract StorkQueries is StorkTypes {
     function requestStorkByParams(
         string memory _phalanxName,
         StorkParameter[] memory _storkRequestParameters,
-        string memory _fallbackFunction
+        string memory _fallbackFunction,
+        string memory _destinationNetwork,
+        address _destinationContract
     ) internal {
         storkQuery.requestStorkByParam(
             _phalanxName,
             _storkRequestParameters,
-            _fallbackFunction
+            _fallbackFunction,
+            _destinationNetwork,
+            _destinationContract
         );
     }
 
@@ -166,12 +180,16 @@ contract StorkQueries is StorkTypes {
     function requestStorkByRange(
         string memory _phalanxName,
         uint32[] memory _storkIdRange,
-        string memory _fallbackFunction
+        string memory _fallbackFunction,
+        string memory _destinationNetwork,
+        address _destinationContract
     ) internal {
         storkQuery.requestStorkByRange(
             _phalanxName,
             _storkIdRange,
-            _fallbackFunction
+            _fallbackFunction,
+            _destinationNetwork,
+            _destinationContract
         );
     }
 }
