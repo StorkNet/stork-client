@@ -35,12 +35,12 @@ contract StorkContract is StorkQueries {
     /// @notice Address of the contract owner
     address public owner;
     uint256 internal lastReqId;
-    mapping(address => bool) approvedContracts;
+    mapping(address => bool) internal approvedContracts;
 
     /// @notice Sets the address of the DCC and MSVC
     /// @dev If the address is not set, set the addresses for DCC and MSVC
     /// @param _storkFund address of the DCC
-    function storkSetup(address payable _storkFund) external payable {
+    function storkSetup(address payable _storkFund) public payable {
         // check if the address is null
         require(storkFund == address(0), "StorkContract already initialized");
 
@@ -73,7 +73,7 @@ contract StorkContract is StorkQueries {
     }
 
     function createPhalanxType(string memory _phalanxName)
-        external
+        internal
         isOwner
     {
         require(phalanxExists[_phalanxName] == false, "Type already exists");
