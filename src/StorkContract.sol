@@ -16,11 +16,26 @@ contract StorkContract is StorkQueries {
         _;
     }
 
+    modifier checkReqId(uint256 _newReqId) {
+        require(_newReqId != lastReqId, "old transaction sent");
+        lastReqId = _newReqId;
+        _;
+    }
+
+    modifier approvedSenderContract(address _fromContract) {
+        require(
+            approvedContracts[_fromContract] == true,
+            "non approved sender"
+        );
+        _;
+    }
     /// @notice Address of stork fund
-    address payable public storkFund;
+    address payable internal storkFund;
 
     /// @notice Address of the contract owner
     address public owner;
+    uint256 internal lastReqId;
+    mapping(address => bool) internal approvedContracts;
 
     /// @notice Sets the address of the DCC and MSVC
     /// @dev If the address is not set, set the addresses for DCC and MSVC
@@ -58,8 +73,7 @@ contract StorkContract is StorkQueries {
     }
 
     function createPhalanxType(string memory _phalanxName)
-        public
-        // PhalanxType[] memory _phalanxType
+        internal
         isOwner
     {
         require(phalanxExists[_phalanxName] == false, "Type already exists");

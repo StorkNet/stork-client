@@ -52,15 +52,21 @@ contract StudentGrades is StorkContract {
     }
 
     function checkStudentPassGrade(uint32[] memory _storkId) external {
-        requestStorkById("student", _storkId, "checkStudentPassGradeFallback");
+        requestStorkById(
+            "student",
+            _storkId,
+            "checkStudentPassGradeFallback(uint8,uint256,bytes)",
+            "l1",
+            address(this)
+        );
     }
 
     function checkStudentPassGradeFallback(
         uint8 _storkId,
-        bytes calldata _storkData
-    ) external {
-        // or Student memory student = decodeStudent(_storkData); costs slightly more gas ?
-
+        uint256 _newReqId,
+        bytes calldata _storkData,
+        address _fromContract
+    ) external checkReqId(_newReqId) approvedSenderContract(_fromContract) {
         uint256 scoreSum;
 
         Student memory student = abi.decode(_storkData, (Student));
@@ -80,8 +86,8 @@ contract StudentGrades is StorkContract {
         updateStorkById("student", _storkId, abi.encode(student));
     }
 
-    function deleteGraduated(StorkParameter[] calldata storkParams) external {
-        deleteStorkByParam("student", storkParams);
+    function deleteGraduated(uint32[] memory _storkId) external {
+        deleteStorkById("student", _storkId);
     }
 
     function decodeStudent(bytes calldata _data)
